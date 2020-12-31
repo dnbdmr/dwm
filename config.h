@@ -32,7 +32,7 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
-static const float mfact     = 0.65; /* factor of master area size [0.05..0.95] */
+static const float mfact     = 0.70; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 
@@ -99,6 +99,7 @@ static Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
+	{ MODKEY,						XK_z,      spawn,			SHCMD("light-locker-command -l && systemctl suspend") },
 	{ MODKEY|ControlMask|ShiftMask, XK_q,      quit,           {1} }, 
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
 	{ 0,							XF86XK_AudioLowerVolume, spawn, SHCMD("pactl set-sink-volume @DEFAULT_SINK@ -5% && pkill -37 dwmblocks") },
