@@ -14,12 +14,12 @@ static const char *fonts[]          = { "monospace:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#000000";
 static const char col_gray2[]       = "#080808";
-static const char col_gray3[]       = "#eeeeee";
+static const char col_gray3[]       = "#102017";
 static const char col_gray4[]       = "#ffffff";
-static const char col_cyan[]        = "#33cccc";
+static const char col_cyan[]        = "#20e0a0";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray2, col_gray2 },
+	[SchemeNorm] = { col_gray4, col_gray2, col_gray3 },
 	[SchemeSel]  = { col_gray1, col_cyan,  col_cyan  },
 };
 
@@ -34,6 +34,7 @@ static const Rule rules[] = {
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+	{ "Quodlibet",  NULL,       NULL,       1 << 5,       0,           -1 },
 };
 
 /* layout(s) */
