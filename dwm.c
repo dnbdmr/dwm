@@ -268,6 +268,7 @@ static void updatetitle(Client *c);
 static void updatewindowtype(Client *c);
 static void updatewmhints(Client *c);
 static void view(const Arg *arg);
+static void viewall(const Arg *arg);
 static Client *wintoclient(Window w);
 static Monitor *wintomon(Window w);
 static Client *wintosystrayicon(Window w);
@@ -2517,39 +2518,80 @@ updatewmhints(Client *c)
 void
 view(const Arg *arg)
 {
+        int i;
+        unsigned int tmptag;
+
+        if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
+                return;
+        selmon->seltags ^= 1; /* toggle sel tagset */
+        if (arg->ui & TAGMASK) {
+                selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
+                selmon->pertag->prevtag = selmon->pertag->curtag;
+
+                if (arg->ui == ~0)
+                        selmon->pertag->curtag = 0;
+                else {
+                        for (i = 0; !(arg->ui & 1 << i); i++) ;
+                        selmon->pertag->curtag = i + 1;
+                }
+        } else {
+                tmptag = selmon->pertag->prevtag;
+                selmon->pertag->prevtag = selmon->pertag->curtag;
+                selmon->pertag->curtag = tmptag;
+        }
+
+        selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
+        selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
+        selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
+        selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
+        selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+
+        if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
+                togglebar(NULL);
+
+        focus(NULL);
+        arrange(selmon);
+}
+
+void
+viewall(const Arg *arg)
+{
 	int i;
 	unsigned int tmptag;
+	Monitor *m;
 
-	if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
-		return;
-	selmon->seltags ^= 1; /* toggle sel tagset */
-	if (arg->ui & TAGMASK) {
-		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
-		selmon->pertag->prevtag = selmon->pertag->curtag;
+	for (m = mons; m; m = m->next) {
+		if ((arg->ui & TAGMASK) == m->tagset[m->seltags])
+			return;
+		m->seltags ^= 1; /* toggle sel tagset */
+		if (arg->ui & TAGMASK) {
+			m->tagset[m->seltags] = arg->ui & TAGMASK;
+			m->pertag->prevtag = m->pertag->curtag;
 
-		if (arg->ui == ~0)
-			selmon->pertag->curtag = 0;
-		else {
-			for (i = 0; !(arg->ui & 1 << i); i++) ;
-			selmon->pertag->curtag = i + 1;
+			if (arg->ui == ~0)
+				m->pertag->curtag = 0;
+			else {
+				for (i = 0; !(arg->ui & 1 << i); i++) ;
+				m->pertag->curtag = i + 1; 
+			}
+		} else {
+			tmptag = m->pertag->prevtag;
+			m->pertag->prevtag = m->pertag->curtag;
+			m->pertag->curtag = tmptag;
 		}
-	} else {
-		tmptag = selmon->pertag->prevtag;
-		selmon->pertag->prevtag = selmon->pertag->curtag;
-		selmon->pertag->curtag = tmptag;
+
+		m->nmaster = m->pertag->nmasters[m->pertag->curtag];
+		m->mfact = m->pertag->mfacts[m->pertag->curtag];
+		m->sellt = m->pertag->sellts[m->pertag->curtag];
+		m->lt[m->sellt] = m->pertag->ltidxs[m->pertag->curtag][m->sellt];
+		m->lt[m->sellt^1] = m->pertag->ltidxs[m->pertag->curtag][m->sellt^1];
+
+		if (m->showbar != m->pertag->showbars[m->pertag->curtag])
+			togglebar(NULL);
+		arrange(m);
+		focus(NULL);
 	}
 
-	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
-	selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
-	selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
-	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
-	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
-
-	if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-		togglebar(NULL);
-
-	focus(NULL);
-	arrange(selmon);
 }
 
 Client *
